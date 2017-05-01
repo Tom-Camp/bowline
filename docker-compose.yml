@@ -34,3 +34,12 @@ web:
   volumes_from:
     - php
   hostname: drupal
+codeclimate:
+  image: civicactions/codeclimate-with-phpcodesniffer-drupal
+  volumes:
+    - ./.codeclimate:/code
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /tmp/cc:/tmp/cc
+  environment:
+    - CODECLIMATE_CODE
+    - CODECLIMATE_DEBUG

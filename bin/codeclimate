@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+source $(dirname $0)/../lib/bowline/bowline
+
+# CodeClimate has a hard time excluding all the files that we need to exclude,
+# so we create a working directory with hard links of all the files we want to
+# test. We do this using the web container to avoid find command compatibility
+# issues.
+rm -rf .codeclimate
+mkdir .codeclimate
+# Custom modules except feature files.
+if [ -d docroot/sites/all/modules/custom ]; then
+  enter find docroot/sites/all/modules/custom -type f ! \( \
+    -name '*.features*.inc' \
+    -or -name '*.strongarm.inc' \
+    -or -name '*_default*.inc' \
+    -or -name '*.panelizer.inc' \
+    -or -name '*.ctools_content.inc' \
+    -or -name '*.field_group.inc' \
+    -or -wholename '*/vendor/*'\
+    \) -exec cp -l --parents {} /var/www/.codeclimate \; > /dev/null
+
+fi
+# Themes, excluding contrib themes.
+THEMES=$(grep -sLF 'datestamp =' docroot/sites/all/themes/*/*.info | cut -d'/' -f1-5)
+if [ "${THEMES}" ]; then
+  enter cp -r --parents $THEMES /var/www/.codeclimate > /dev/null
+fi
+# Behat test steps.
+if [ -d tests/behat/features/bootstrap ]; then
+  enter cp -r --parents tests/behat/features/bootstrap/ /var/www/.codeclimate > /dev/null
+fi
+# Code standard configuration files.
+enter find . -maxdepth 1 -size -1000k -type f -exec cp -l {} /var/www/.codeclimate \; > /dev/null
+
+# Run CodeClimate then clean up.
+$DCOMPOSE run --rm -e CODECLIMATE_CODE="$PWD/.codeclimate" codeclimate "$@"
+rm -rf .codeclimate

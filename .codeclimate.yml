@@ -1,0 +1,30 @@
+---
+engines:
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+      - php
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+    config:
+      file_extensions: "php,module,inc,test,profile,theme,engine"
+      rulesets: "phpmd.xml"
+  markdownlint:
+    enabled: true
+  phan:
+    enabled: true
+  phpcodesniffer-drupal:
+    enabled: true
+    config:
+      file_extensions: "php,module,inc,install,test,profile,theme,engine,js,css,info,txt,md"
+      standard: "Drupal,DrupalPractice"
+  scss-lint:
+    enabled: true
